@@ -1,0 +1,11 @@
+; otus.project config file
+
+[database]
+host=localhost
+port=3306
+db=otus
+user=otus
+password=
+
+[app]
+key=otus_key
