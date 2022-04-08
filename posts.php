@@ -8,36 +8,106 @@ if(!empty($_GET['action']) && $_GET['action'] === 'add_post')
     header('Location: /');
 }
 
+if(!empty($_GET['action']) && $_GET['action'] === 'hide_post')
+{
+    hidePost($_GET['post_id']);
+    header('Location: /');
+}
+
+if(!empty($_GET['action']) && $_GET['action'] === 'delete_post')
+{
+    deletePost($_GET['post_id']);
+    header('Location: /');
+}
+
 if(isAuthenticated()) { ?>
-    <form action="/posts.php?action=add_post" method="POST">
-        <div>
+    <div>
+        <form action="/posts.php?action=add_post" method="POST">
             <div>
-                <label for="post_title">Заголовок объявления:</label>
+                <div>
+                    <label for="post_title">Заголовок объявления:</label>
+                </div>
+                <div>
+                    <input type="text" name="post_title" />
+                </div>
+                <div>
+                    <label for="post_data">Текст объявления:</label>
+                </div>
+                <div>
+                    <textarea name="post_data"></textarea>
+                </div>
+                <div>
+                    <input type="submit" value="Создать объявление" />
+                </div>
             </div>
+        </form>
+    </div>
+    <hr>
+    <div>
+        <form action="/posts.php?action=search" method="POST">
             <div>
-                <input type="text" name="post_title" />
+                <div>
+                    <label for="username">Автор:</label>
+                </div>
+                <div>
+                    <input type="text" name="username" />
+                </div>
+                <div>
+                    <label for="post_data">Текст объявления:</label>
+                </div>
+                <div>
+                    <input type="text" name="post_data" />
+                </div>
+                <div>
+                <label for="title">Заголовок объявления:</label>
+                </div>
+                <div>
+                    <input type="text" name="title" />
+                </div>
+                <div>
+                    <input type="submit" value="Поиск" />
+                </div>
             </div>
-            <div>
-                <label for="post_data">Текст объявления:</label>
-            </div>
-            <div>
-                <textarea name="post_data"></textarea>
-            </div>
-            <div>
-                <input type="submit" name="Создать объявление" />
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 <?php } ?>
 <h3>Доска объявлений:</h3>
 <?php
+$page = !empty($_GET['page']) ? intval($_GET['page']) : 0;
+if(!empty($_GET['action']) && $_GET['action'] === 'search')
+{
+    $posts = getPosts($page, $_POST);
+} else {
+    $posts = getPosts($page);
+}
 
-$posts = getPosts();
 
 foreach($posts as $post)
 {
     echo "<div><div>Объявление №{$post['id']} от {$post['created_at']}. Оставил {$post['username']}</div>";
-    echo "<div>" . $post['post_data'] . "</div></div><hr>";
+    echo "<h4>{$post['title']}</h4>";
+    echo "<div>" . $post['post_data'] . "</div></div>";
+    if(!empty($_SESSION['is_admin']) && $_SESSION['is_admin'])
+    {
+        echo "<div><a href=\"/posts.php?action=hide_post&post_id={$post['id']}\">Скрыть</a> | <a href=\"/posts.php?action=delete_post&post_id={$post['id']}\">Удалить</a></div>";
+    }
+    echo "<hr>";
 }
+
+
+$count = getPostsCount();
+echo "<div>";
+if($page > 0)
+{
+    $prevPage = $page - 1;
+    echo "<a href=\"/posts.php?page={$prevPage}\"><< Назад</a>";
+}
+echo " | ";
+if($count > $page * 25)
+{
+    $nextPage = $page + 1;
+    echo "<a href=\"/posts.php?page={$nextPage}\">Дальше >></a>";
+}
+echo "</div>";
 
 ?>

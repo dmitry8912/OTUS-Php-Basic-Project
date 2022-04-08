@@ -17,4 +17,3 @@ function getConnection(): PDO {
     global $persistentConnection;
     return $persistentConnection;
 }
-
