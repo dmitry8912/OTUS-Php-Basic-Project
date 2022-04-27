@@ -4,19 +4,19 @@ require_once 'requirements.php';
 session_start();
 if(!empty($_GET['action']) && $_GET['action'] === 'add_post')
 {
-    addPost($_SESSION['user_id'], $_POST['post_title'], $_POST['post_data']);
+    (new Post($_SESSION['user_id'], $_POST['post_title'], $_POST['post_data']))->save();
     header('Location: /');
 }
 
 if(!empty($_GET['action']) && $_GET['action'] === 'hide_post')
 {
-    hidePost($_GET['post_id']);
+    Post::hide($_GET['post_id']);
     header('Location: /');
 }
 
 if(!empty($_GET['action']) && $_GET['action'] === 'delete_post')
 {
-    deletePost($_GET['post_id']);
+    Post::delete($_GET['post_id']);
     header('Location: /');
 }
 
@@ -74,12 +74,7 @@ if(isAuthenticated()) { ?>
 <h3>Доска объявлений:</h3>
 <?php
 $page = !empty($_GET['page']) ? intval($_GET['page']) : 0;
-if(!empty($_GET['action']) && $_GET['action'] === 'search')
-{
-    $posts = getPosts($page, $_POST);
-} else {
-    $posts = getPosts($page);
-}
+$posts = new Posts($page, $_POST);
 
 
 foreach($posts as $post)
@@ -95,7 +90,7 @@ foreach($posts as $post)
 }
 
 
-$count = getPostsCount();
+$count = count($posts);
 echo "<div>";
 if($page > 0)
 {

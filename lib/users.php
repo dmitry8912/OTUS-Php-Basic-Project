@@ -16,6 +16,7 @@ function registerUser($username, $password) {
 
     $db = getConnection();
     $query = $db->prepare("select * from users where username = ?");
+
     $query->execute([$username]);
     if($query->rowCount() > 0)
         return false;
